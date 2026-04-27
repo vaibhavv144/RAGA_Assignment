@@ -1,242 +1,425 @@
+# Healthcare Operations Platform (Frontend)
 
-<<<<<<< HEAD
-A frontend application that simulates a B2B healthcare operations platform —
-authentication, dashboard, analytics, and a patient panel with grid/list views
-plus push-style notifications delivered through a service worker.
+A frontend application that simulates a B2B healthcare operations platform — authentication, dashboard, analytics, and a patient panel with grid/list views plus push-style notifications delivered through a service worker.
 
-Built as a frontend assignment to demonstrate code quality, architecture, and
-real-world feature handling.
+Built as a frontend assignment to demonstrate code quality, architecture, and real-world feature handling.
+
+---
 
 ## Highlights
 
 - **React 18 + TypeScript (strict)** with Vite for fast HMR and code-split builds.
-- **Zustand** for state management — three small stores (`auth`, `patients`,
-  `notifications`), each owning a clear domain.
-- **Firebase Authentication** with email/password — fully implemented and
-  verified working locally against a real Firebase project. The app also ships
-  with a built-in mock auth provider so reviewers can sign in instantly using
-  the demo accounts shown right on the login page (no Firebase setup needed).
-- **Service worker** with offline app-shell caching, page-to-SW notification
-  bridge, and a `push` event handler ready for FCM / web-push.
-- **Recharts** for performant SVG charts (area, bar, pie, line).
-- **CSS Modules + design tokens** (no UI library) — a small, scalable design
-  system tuned for healthcare data density.
-- **Code-splitting per route** via `React.lazy` and a `manualChunks` config
-  (react / firebase / charts / app), so the login bundle is tiny.
-- **Accessible**: keyboard activation on patient cards/rows, focus rings,
-  ARIA attributes on dialogs, segmented controls, and notification badges.
-- **Responsive** down to mobile (hides sidebar, collapses grids).
+- **Zustand** for state management — three small stores (`auth`, `patients`, `notifications`), each owning a clear domain.
+- **Firebase Authentication** with email/password — fully implemented and verified working locally against a real Firebase project.
+- Built-in **mock auth provider** so reviewers can sign in instantly using demo accounts.
+- **Service worker** with:
+  - Offline app-shell caching
+  - Page-to-SW notification bridge
+  - Push event handler ready for FCM / web-push
+- **Recharts** for analytics visualizations.
+- **CSS Modules + design tokens** (no UI library).
+- **Code-splitting per route** using `React.lazy` and Vite `manualChunks`.
+- **Accessible UI** with keyboard navigation, focus rings, ARIA support.
+- Fully **responsive** design.
 
-## Quick start
+---
+
+## Quick Start
+
+### 1. Install dependencies
 
 ```bash
-# 1. Install
 npm install
+```
 
-# 2. Run in dev mode (uses mock auth out of the box)
+### 2. Run development server
+
+```bash
 npm run dev
+```
 
-# 3. Production build
+### 3. Build for production
+
+```bash
 npm run build
 npm run preview
 ```
 
-Open the dev URL Vite prints (default <http://localhost:5173>). The app ships
-in **mock auth mode by default** so anyone cloning the repo can sign in
-without setting up Firebase — the credentials are listed on the login page
-itself, and clicking a row auto-fills the form.
+Open:
+
+```text
+http://localhost:5173
+```
+
+The app runs in **mock auth mode by default**, so no Firebase setup is required.
+
+---
 
 ## Authentication
 
-Two providers are wired up behind a single interface
-([`src/services/auth.service.ts`](src/services/auth.service.ts)). The active
-one is selected at boot from environment config:
+Two providers are wired behind a single interface:
+
+`src/services/auth.service.ts`
+
+The active provider is selected at runtime:
 
 ```ts
-// src/services/firebase.ts
 export const useMockAuth =
-  import.meta.env.VITE_USE_MOCK_AUTH === 'true' || !config.apiKey;
+  import.meta.env.VITE_USE_MOCK_AUTH === "true" || !config.apiKey;
 ```
 
-### 1. Mock auth — the default for reviewers
+---
 
-Zero setup. Run `npm install && npm run dev` and use one of the credentials
-displayed inside the **"Demo accounts (mock auth)"** card on the login page:
+## Mock Authentication (Default)
 
-| Email                    | Password   | Role          |
-| ------------------------ | ---------- | ------------- |
-| `admin@healthplus.io`    | `demo1234` | Admin         |
-| `doctor@healthplus.io`   | `demo1234` | Practitioner  |
+No setup required.
 
-The mock provider mirrors Firebase's API surface (`login`, `logout`,
-`subscribe`) and persists the session to `localStorage`, so the rest of the
-app — route guards, header, sign-out, etc. — behaves identically to the real
-Firebase path. This exists purely so the assignment can be reviewed end-to-end
-without anyone needing access to a Firebase console.
+Use these demo credentials:
 
-### 2. Real Firebase auth — verified working locally
+| Email                  | Password | Role         |
+| ---------------------- | -------- | ------------ |
+| admin@healthplus.io    | demo1234 | Admin        |
+| doctor@healthplus.io   | demo1234 | Practitioner |
 
-The Firebase email/password flow was implemented end-to-end and **tested on my
-local machine against a real Firebase project**, signing in successfully with
-an account I created in the Firebase Console. The reason this README still
-points reviewers at the mock accounts is that committing my Firebase
-credentials would expose the API key and require everyone to share my
-project; instead, anyone can plug in their own Firebase project with two file
-edits:
+Features:
 
-1. Copy `.env.example` to `.env.local`.
-2. Paste your Firebase web config from **Firebase Console → Project Settings →
-   Your apps → Web app SDK setup**.
-3. Set `VITE_USE_MOCK_AUTH=false`.
-4. In **Firebase Console → Authentication**, enable the **Email/Password**
-   sign-in method and create a user under the **Users** tab.
-5. Restart `npm run dev`.
+- Mirrors Firebase API (`login`, `logout`, `subscribe`)
+- Session persistence via `localStorage`
+- Same route guards and session restore logic
 
-When real Firebase is active, the demo-accounts card on the login page
-disappears (it's gated by `useMockAuth`), which serves as a visual
-confirmation that you're now hitting `identitytoolkit.googleapis.com`.
+---
 
-The auth service translates Firebase error codes
-(`auth/wrong-password`, `auth/invalid-credential`, `auth/too-many-requests`,
-`auth/network-request-failed`, etc.) into user-friendly messages so the UI
-never surfaces raw codes — see
-[`auth.service.ts:103`](src/services/auth.service.ts#L103).
+## Firebase Authentication (Real)
 
-> Both paths share the same Zustand store, route guard, and session-restore
-> hook. Swapping providers is a config change, not a code change.
+The Firebase authentication flow has been implemented and verified locally.
 
-## Pages
+To use Firebase:
 
-| Route         | Purpose                                                                                      |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| `/login`      | Email/password sign-in, validation, demo accounts                                            |
-| `/dashboard`  | Welcome, KPI cards, admissions chart, critical watchlist, upcoming appointments              |
-| `/analytics`  | Revenue vs target, risk distribution, department load, patient satisfaction                  |
-| `/patients`   | Patient panel with grid/list toggle, search, filters, and a side-drawer detail view          |
+### Setup
 
-## Patient Details — grid / list toggle
+1. Copy environment template:
 
-The `/patients` page renders the same data through two presentations:
+```bash
+cp .env.example .env.local
+```
 
-- **Grid view** — `PatientCard` components with primary condition, department,
-  physician, next visit, status, risk tag.
-- **List view** — denser tabular layout, scannable for triage workflows.
+2. Add Firebase config values.
 
-The active view is persisted to `localStorage` so the user's preference sticks
-across sessions, and the toggle is a fully accessible segmented control with
-`aria-pressed` state.
+3. Set:
 
-Tapping a card or row opens the **PatientDetailDrawer** — a slide-in side
-panel with full profile, contact info, and a "Notify care team" action that
-fires a push notification through the service worker.
+```env
+VITE_USE_MOCK_AUTH=false
+```
+
+4. Enable Email/Password auth in Firebase Console.
+
+5. Create users in Firebase Authentication.
+
+6. Restart:
+
+```bash
+npm run dev
+```
+
+---
+
+## Routes
+
+| Route        | Description |
+|-------------|-------------|
+| `/login` | Sign in page |
+| `/dashboard` | KPI dashboard |
+| `/analytics` | Business analytics |
+| `/patients` | Patient management panel |
+
+---
+
+## Patient Module
+
+The `/patients` page supports:
+
+### Grid View
+
+Uses `PatientCard` components.
+
+Displays:
+
+- Condition
+- Department
+- Physician
+- Next visit
+- Status
+- Risk tag
+
+### List View
+
+Compact table-based layout for quick triage workflows.
+
+### Features
+
+- Search
+- Filters
+- View toggle
+- Persisted preferences (`localStorage`)
+- Accessible segmented controls
+
+---
+
+## Patient Detail Drawer
+
+Clicking a patient opens a slide-in drawer.
+
+Shows:
+
+- Full profile
+- Contact information
+- Medical overview
+- Notify care team action
+
+This triggers notifications through the service worker.
+
+---
 
 ## Notifications & Service Worker
 
-The service worker lives at [`public/service-worker.js`](public/service-worker.js).
-On boot, the app registers it via `notification.service.ts`. Three things work:
+Location:
 
-1. **Offline app-shell**: the SW caches `/`, `index.html`, manifest, and favicon
-   so the app loads even with no network.
-2. **Local notifications**: the page sends a `SHOW_NOTIFICATION` message to the
-   active SW; the SW calls `registration.showNotification(...)`. This is what
-   the "Trigger demo alert" button on the dashboard, the "Notify care team"
-   button on the drawer, and a recurring vitals alert all use.
-3. **Push notifications**: the SW also implements a `push` listener and a
-   `notificationclick` handler that focuses or opens a tab — wire this to FCM
-   or any web-push provider in production with no front-end changes.
-
-Permission is requested *only after* the user opts in (banner inside the
-notification center), respecting modern UX guidelines and avoiding the
-"prompt-on-load" anti-pattern.
-
-## State management
-
-Three Zustand stores, each with a narrow API:
-
+```text
+public/service-worker.js
 ```
+
+### Features
+
+### 1. Offline App Shell
+
+Caches:
+
+- `/`
+- `index.html`
+- manifest
+- favicon
+
+### 2. Local Notifications
+
+Uses:
+
+```js
+SHOW_NOTIFICATION
+```
+
+Supported actions:
+
+- Dashboard alerts
+- Care team notifications
+- Vitals monitoring alerts
+
+### 3. Push Notifications
+
+Implements:
+
+- `push`
+- `notificationclick`
+
+Ready for:
+
+- Firebase Cloud Messaging (FCM)
+- Any Web Push provider
+
+---
+
+## State Management
+
+Using Zustand.
+
+Project stores:
+
+```text
 src/store/
-  authStore.ts          // user, status, login/logout, init listener
-  patientStore.ts       // patient list, view mode, filters, selection
-  notificationStore.ts  // in-app feed, permission, SW init, push action
+├── authStore.ts
+├── patientStore.ts
+└── notificationStore.ts
 ```
 
-Why Zustand over Redux for this scope:
+### authStore
 
-- Smaller bundle, no boilerplate (no actions/reducers/types ceremony).
-- Co-located actions on the slice, easy to test, easy to mock.
-- Selectors are just functions of state — derive lists with `useMemo` from a
-  base slice rather than from the store, which avoids re-render storms when
-  unrelated slices change.
+Manages:
 
-## Project structure
+- User session
+- Auth state
+- Login/logout
+- Init listener
 
-```
+### patientStore
+
+Manages:
+
+- Patient data
+- Filters
+- Selected patient
+- View mode
+
+### notificationStore
+
+Manages:
+
+- Notifications feed
+- Permission state
+- Service worker initialization
+
+---
+
+## Why Zustand?
+
+- Lightweight
+- Minimal boilerplate
+- Easy testing
+- Simpler than Redux for this scale
+- Fast selectors
+
+---
+
+## Project Structure
+
+```text
 src/
-├── App.tsx                  # routes + boot-time hooks
-├── main.tsx                 # React entry
+├── App.tsx
+├── main.tsx
 ├── components/
-│   ├── auth/                # ProtectedRoute
-│   ├── common/              # Button, Avatar, Tag, StatCard, Icon, …
-│   ├── layout/              # AppLayout, Sidebar, Header, NotificationCenter
-│   └── patients/            # PatientCard, PatientRow, ViewToggle, Drawer
-├── data/                    # seed patient dataset (typed)
-├── hooks/                   # useInitAuth, useNotifications, demo seeder
-├── pages/                   # Login, Dashboard, Analytics, Patients
-├── services/                # firebase, auth.service, notification.service
-├── store/                   # zustand slices
-├── styles/                  # global.css (tokens) + animations.css
-├── types/                   # shared domain types
-└── utils/                   # formatters
+│   ├── auth/
+│   ├── common/
+│   ├── layout/
+│   └── patients/
+├── data/
+├── hooks/
+├── pages/
+├── services/
+├── store/
+├── styles/
+├── types/
+└── utils/
 ```
 
-### Why this structure scales
+---
 
-- **Pages** are thin — they compose components and read from stores.
-- **Services** isolate side-effecting libraries (Firebase, Notifications API)
-  behind a stable interface, so swapping providers is a single-file change.
-- **Components/common** stays UI-pure — no domain knowledge — making it usable
-  across pages and easy to extract into a shared package later.
-- **Components/{domain}** is where domain UI lives (e.g. `patients/`) and is
-  the natural seam if you ever split this into a micro-frontend.
+## Architecture Decisions
 
-## Performance notes
+### Pages stay thin
 
-- **Code-splitting**: each route is `React.lazy`-loaded; charts and Firebase
-  ship in their own chunks via `vite.config.ts → manualChunks`.
-- **CSS Modules**: scoped, tree-shakeable, no runtime cost.
-- **Memoised derivations**: filters, departments, and dashboard aggregates use
-  `useMemo` to avoid recomputing on unrelated state changes.
-- **Stable selectors**: stores expose primitive/atomic slices; derived data is
-  computed in components rather than via selectors that return new arrays.
-- **Service worker** caches the shell so repeat visits start in milliseconds.
-- **Source maps** are emitted for production debugging.
+Pages only compose UI and connect stores.
 
-## Bonus / forward-looking
+### Services isolate side effects
 
-- **Micro-frontend ready**: the `components/{domain}` boundary, plus the
-  service-layer indirection, means the patients module could be lifted into a
-  remote with Module Federation or vite-plugin-federation with minimal change.
-- **Reusable design system**: tokens in `global.css`, primitives in
-  `components/common`. Adding a Storybook is the natural next step.
-- **Pluggable auth**: the auth service already abstracts Firebase vs mock —
-  adding SSO/Magic Link is just another provider behind the same `login()` /
-  `subscribe()` API.
+Examples:
 
-## Scripts
+- Firebase
+- Notifications API
 
-| Command            | What it does                              |
-| ------------------ | ----------------------------------------- |
-| `npm run dev`      | Start Vite dev server                     |
-| `npm run build`    | Type-check and build production bundle    |
-| `npm run preview`  | Serve the production build locally        |
-| `npm run lint`     | Type-check (`tsc --noEmit`) only          |
+This makes provider swapping easy.
 
-## Tested browsers
+### Shared UI primitives
 
-- Chromium / Edge — full support (notifications + SW).
-- Firefox — full support.
-- Safari — works; SW push requires user gesture per Apple's policy.
-#   R A G A _ A s s i g n m e n t  
- 
-=======
->>>>>>> ddcc601c31178065a4d8648f42efcbc7b5e358ec
+Reusable components inside:
+
+```text
+components/common
+```
+
+### Domain-specific UI separation
+
+Example:
+
+```text
+components/patients
+```
+
+Helps scale into micro-frontends.
+
+---
+
+## Performance Optimizations
+
+- Route-level lazy loading
+- Vite manual chunk splitting
+- CSS Modules
+- Memoized derivations
+- Stable store selectors
+- Service worker caching
+- Production source maps
+
+---
+
+## Forward-looking Improvements
+
+### Micro-frontend ready
+
+The domain boundaries support Module Federation.
+
+### Design system ready
+
+Design tokens and UI primitives can evolve into Storybook.
+
+### Pluggable auth providers
+
+Can add:
+
+- Google Auth
+- SSO
+- Magic Link
+
+without changing UI logic.
+
+---
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build production bundle |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Type-check only |
+
+---
+
+## Browser Support
+
+### Fully Supported
+
+- Chromium
+- Google Chrome
+- Microsoft Edge
+- Firefox
+
+### Supported with limitations
+
+- Safari  
+  (Push notifications require user interaction)
+
+---
+
+## Tech Stack
+
+- React 18
+- TypeScript
+- Vite
+- Zustand
+- Firebase Auth
+- Recharts
+- CSS Modules
+- Service Workers
+
+---
+
+## Future Integrations
+
+- Firebase Cloud Messaging
+- Web Push APIs
+- Storybook
+- Module Federation
+- SSO providers
+
+---
+
+## License
+
+This project was built as a frontend technical assignment for demonstration purposes.
