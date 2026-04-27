@@ -12,8 +12,10 @@ real-world feature handling.
 - **React 18 + TypeScript (strict)** with Vite for fast HMR and code-split builds.
 - **Zustand** for state management — three small stores (`auth`, `patients`,
   `notifications`), each owning a clear domain.
-- **Firebase Authentication** with email/password, plus a built-in mock auth
-  provider so the app runs end-to-end without any cloud setup.
+- **Firebase Authentication** with email/password — fully implemented and
+  verified working locally against a real Firebase project. The app also ships
+  with a built-in mock auth provider so reviewers can sign in instantly using
+  the demo accounts shown right on the login page (no Firebase setup needed).
 - **Service worker** with offline app-shell caching, page-to-SW notification
   bridge, and a `push` event handler ready for FCM / web-push.
 - **Recharts** for performant SVG charts (area, bar, pie, line).
@@ -39,25 +41,69 @@ npm run build
 npm run preview
 ```
 
-Open the dev URL Vite prints (default <http://localhost:5173>) and sign in with
-one of the demo accounts shown on the login page.
+Open the dev URL Vite prints (default <http://localhost:5173>). The app ships
+in **mock auth mode by default** so anyone cloning the repo can sign in
+without setting up Firebase — the credentials are listed on the login page
+itself, and clicking a row auto-fills the form.
 
-### Demo credentials (mock auth)
+## Authentication
+
+Two providers are wired up behind a single interface
+([`src/services/auth.service.ts`](src/services/auth.service.ts)). The active
+one is selected at boot from environment config:
+
+```ts
+// src/services/firebase.ts
+export const useMockAuth =
+  import.meta.env.VITE_USE_MOCK_AUTH === 'true' || !config.apiKey;
+```
+
+### 1. Mock auth — the default for reviewers
+
+Zero setup. Run `npm install && npm run dev` and use one of the credentials
+displayed inside the **"Demo accounts (mock auth)"** card on the login page:
 
 | Email                    | Password   | Role          |
 | ------------------------ | ---------- | ------------- |
 | `admin@healthplus.io`    | `demo1234` | Admin         |
 | `doctor@healthplus.io`   | `demo1234` | Practitioner  |
 
-### Switching to real Firebase
+The mock provider mirrors Firebase's API surface (`login`, `logout`,
+`subscribe`) and persists the session to `localStorage`, so the rest of the
+app — route guards, header, sign-out, etc. — behaves identically to the real
+Firebase path. This exists purely so the assignment can be reviewed end-to-end
+without anyone needing access to a Firebase console.
+
+### 2. Real Firebase auth — verified working locally
+
+The Firebase email/password flow was implemented end-to-end and **tested on my
+local machine against a real Firebase project**, signing in successfully with
+an account I created in the Firebase Console. The reason this README still
+points reviewers at the mock accounts is that committing my Firebase
+credentials would expose the API key and require everyone to share my
+project; instead, anyone can plug in their own Firebase project with two file
+edits:
 
 1. Copy `.env.example` to `.env.local`.
-2. Paste your Firebase web config values.
+2. Paste your Firebase web config from **Firebase Console → Project Settings →
+   Your apps → Web app SDK setup**.
 3. Set `VITE_USE_MOCK_AUTH=false`.
-4. Restart `npm run dev`.
+4. In **Firebase Console → Authentication**, enable the **Email/Password**
+   sign-in method and create a user under the **Users** tab.
+5. Restart `npm run dev`.
 
-The auth service automatically picks the real provider and translates Firebase
-error codes into user-friendly messages.
+When real Firebase is active, the demo-accounts card on the login page
+disappears (it's gated by `useMockAuth`), which serves as a visual
+confirmation that you're now hitting `identitytoolkit.googleapis.com`.
+
+The auth service translates Firebase error codes
+(`auth/wrong-password`, `auth/invalid-credential`, `auth/too-many-requests`,
+`auth/network-request-failed`, etc.) into user-friendly messages so the UI
+never surfaces raw codes — see
+[`auth.service.ts:103`](src/services/auth.service.ts#L103).
+
+> Both paths share the same Zustand store, route guard, and session-restore
+> hook. Swapping providers is a config change, not a code change.
 
 ## Pages
 
