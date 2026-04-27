@@ -1,5 +1,5 @@
-# HealthPlus — B2B Healthcare SaaS UI
 
+<<<<<<< HEAD
 A frontend application that simulates a B2B healthcare operations platform —
 authentication, dashboard, analytics, and a patient panel with grid/list views
 plus push-style notifications delivered through a service worker.
@@ -238,3 +238,5 @@ src/
 - Safari — works; SW push requires user gesture per Apple's policy.
 #   R A G A _ A s s i g n m e n t  
  
+=======
+>>>>>>> ddcc601c31178065a4d8648f42efcbc7b5e358ec
