@@ -76,10 +76,10 @@ No setup required.
 
 Use these demo credentials:
 
-| Email                  | Password | Role         |
-| ---------------------- | -------- | ------------ |
-| admin@healthplus.io    | demo1234 | Admin        |
-| doctor@healthplus.io   | demo1234 | Practitioner |
+| Email                  | Password 
+| ---------------------- | -------- 
+| admin@healthplus.io    | demo1234 
+| doctor@healthplus.io   | demo1234 
 
 Features:
 
@@ -381,21 +381,8 @@ without changing UI logic.
 
 ---
 
-## Browser Support
 
-### Fully Supported
 
-- Chromium
-- Google Chrome
-- Microsoft Edge
-- Firefox
-
-### Supported with limitations
-
-- Safari  
-  (Push notifications require user interaction)
-
----
 
 ## Tech Stack
 
@@ -410,16 +397,5 @@ without changing UI logic.
 
 ---
 
-## Future Integrations
 
-- Firebase Cloud Messaging
-- Web Push APIs
-- Storybook
-- Module Federation
-- SSO providers
 
----
-
-## License
-
-This project was built as a frontend technical assignment for demonstration purposes.
