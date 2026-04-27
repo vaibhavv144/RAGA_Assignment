@@ -1,0 +1,33 @@
+# Normalize line endings across Windows/macOS/Linux
+* text=auto eol=lf
+
+# Force LF for source files
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.js        text eol=lf
+*.jsx       text eol=lf
+*.json      text eol=lf
+*.css       text eol=lf
+*.html      text eol=lf
+*.md        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# Treat these as binary so Git doesn't try to diff/normalize
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.svg       text eol=lf
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.otf       binary
+*.eot       binary
+*.pdf       binary
+
+# Lock files: keep LF, never auto-merge
+package-lock.json   text eol=lf -merge
+yarn.lock           text eol=lf -merge
+pnpm-lock.yaml      text eol=lf -merge

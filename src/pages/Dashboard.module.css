@@ -1,0 +1,142 @@
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.statsGrid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.gridTwo {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 2fr 1fr;
+}
+
+@media (max-width: 1024px) {
+  .gridTwo {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  color: #f8fafc;
+}
+
+.cardSubtitle {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.cardLink {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.cardLink:hover {
+  color: #5eead4;
+}
+
+.watchList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.watchItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.watchItem:hover {
+  background: var(--glass-hover);
+}
+
+.watchBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.watchName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watchMeta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  color: #e2e8f0;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.patientCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.patientName {
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.patientId {
+  font-size: 11px;
+  color: var(--color-text-faint);
+}

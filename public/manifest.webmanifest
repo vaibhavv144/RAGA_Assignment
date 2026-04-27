@@ -1,0 +1,17 @@
+{
+  "name": "HealthPlus · Healthcare Operations Platform",
+  "short_name": "HealthPlus",
+  "description": "B2B healthcare SaaS for clinics and hospital networks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b1a",
+  "theme_color": "#070b1a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+# --- Dependencies ---
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/install-state.gz
+jspm_packages/
+
+# --- Build output / caches ---
+dist/
+dist-ssr/
+build/
+.vite/
+.cache/
+.turbo/
+.parcel-cache/
+*.tsbuildinfo
+
+# Vite writes a timestamped temp config when HMR-ing the config file
+vite.config.*.timestamp-*
+
+# --- Env files (NEVER commit — contain Firebase API keys etc.) ---
+# Belt + braces: ignore all common .env variants and any *.local file.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+*.local
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Test / coverage ---
+coverage/
+*.lcov
+.nyc_output/
+
+# --- Linter / formatter caches ---
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# --- Editors / IDEs ---
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+.history/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+
+# --- OS files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Misc ---
+*.tgz
+*.tsbuildinfo
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Built service worker artifacts (only relevant if you switch to workbox/inject)
+sw.js.map

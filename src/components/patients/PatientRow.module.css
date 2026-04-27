@@ -1,0 +1,41 @@
+.row {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.row:hover {
+  background: var(--glass-hover);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #f8fafc;
+}
+
+.id {
+  font-size: 11px;
+  color: var(--color-text-faint);
+}
+
+.condition {
+  font-weight: 500;
+  font-size: 13px;
+  color: #e2e8f0;
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
